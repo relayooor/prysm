@@ -1,3 +1,5 @@
+`production` branch - version currently deployed at relayooor.wtf
+
 # Prysm: An Ethereum Consensus Implementation Written in Go
 
 [![Build status](https://badge.buildkite.com/b555891daf3614bae4284dcf365b2340cefc0089839526f096.svg?branch=master)](https://buildkite.com/prysmatic-labs/prysm)
