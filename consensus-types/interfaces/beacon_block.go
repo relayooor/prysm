@@ -4,6 +4,7 @@ import (
 	ssz "github.com/prysmaticlabs/fastssz"
 	field_params "github.com/prysmaticlabs/prysm/v3/config/fieldparams"
 	types "github.com/prysmaticlabs/prysm/v3/consensus-types/primitives"
+	enginev1 "github.com/prysmaticlabs/prysm/v3/proto/engine/v1"
 	ethpb "github.com/prysmaticlabs/prysm/v3/proto/prysm/v1alpha1"
 	validatorpb "github.com/prysmaticlabs/prysm/v3/proto/prysm/v1alpha1/validator-client"
 	"google.golang.org/protobuf/proto"
@@ -23,6 +24,8 @@ type SignedBeaconBlock interface {
 	ToBlinded() (SignedBeaconBlock, error)
 	PbBellatrixBlock() (*ethpb.SignedBeaconBlockBellatrix, error)
 	PbBlindedBellatrixBlock() (*ethpb.SignedBlindedBeaconBlockBellatrix, error)
+	PbCapellaBlock() (*ethpb.SignedBeaconBlockCapella, error)
+	PbBlindedCapellaBlock() (*ethpb.SignedBlindedBeaconBlockCapella, error)
 	ssz.Marshaler
 	ssz.Unmarshaler
 	Version() int
@@ -65,6 +68,7 @@ type BeaconBlockBody interface {
 	HashTreeRoot() ([field_params.RootLength]byte, error)
 	Proto() (proto.Message, error)
 	Execution() (ExecutionData, error)
+	BLSToExecutionChanges() ([]*ethpb.SignedBLSToExecutionChange, error)
 }
 
 // ExecutionData represents execution layer information that is contained
@@ -89,4 +93,7 @@ type ExecutionData interface {
 	BaseFeePerGas() []byte
 	BlockHash() []byte
 	Transactions() ([][]byte, error)
+	TransactionsRoot() ([]byte, error)
+	Withdrawals() ([]*enginev1.Withdrawal, error)
+	WithdrawalsRoot() ([]byte, error)
 }

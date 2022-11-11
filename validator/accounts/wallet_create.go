@@ -13,7 +13,7 @@ import (
 	"github.com/prysmaticlabs/prysm/v3/validator/keymanager/remote"
 )
 
-// CreateWalletWithKeymanager specified by configuration options.
+// WalletCreate creates wallet specified by configuration options.
 func (acm *AccountsCLIManager) WalletCreate(ctx context.Context) (*wallet.Wallet, error) {
 	w := wallet.New(&wallet.Config{
 		WalletDir:      acm.walletDir,
@@ -55,6 +55,7 @@ func (acm *AccountsCLIManager) WalletCreate(ctx context.Context) (*wallet.Wallet
 			ctx,
 			w,
 			acm.mnemonic25thWord,
+			acm.mnemonicLanguage,
 			acm.skipMnemonicConfirm,
 			acm.numAccounts,
 		); err != nil {
@@ -92,6 +93,7 @@ func createDerivedKeymanagerWallet(
 	ctx context.Context,
 	wallet *wallet.Wallet,
 	mnemonicPassphrase string,
+	mnemonicLanguage string,
 	skipMnemonicConfirm bool,
 	numAccounts int,
 ) error {
@@ -108,11 +110,11 @@ func createDerivedKeymanagerWallet(
 	if err != nil {
 		return errors.Wrap(err, "could not initialize HD keymanager")
 	}
-	mnemonic, err := derived.GenerateAndConfirmMnemonic(skipMnemonicConfirm)
+	mnemonic, err := derived.GenerateAndConfirmMnemonic(mnemonicLanguage, skipMnemonicConfirm)
 	if err != nil {
 		return errors.Wrap(err, "could not confirm mnemonic")
 	}
-	if err := km.RecoverAccountsFromMnemonic(ctx, mnemonic, mnemonicPassphrase, numAccounts); err != nil {
+	if err := km.RecoverAccountsFromMnemonic(ctx, mnemonic, mnemonicLanguage, mnemonicPassphrase, numAccounts); err != nil {
 		return errors.Wrap(err, "could not recover accounts from mnemonic")
 	}
 	return nil

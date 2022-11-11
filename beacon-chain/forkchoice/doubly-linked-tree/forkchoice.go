@@ -136,7 +136,7 @@ func (f *ForkChoice) InsertNode(ctx context.Context, state state.BeaconState, ro
 			return err
 		}
 		if ph != nil {
-			copy(payloadHash[:], ph.BlockHash)
+			copy(payloadHash[:], ph.BlockHash())
 		}
 	}
 	jc := state.CurrentJustifiedCheckpoint()
@@ -275,7 +275,7 @@ func (f *ForkChoice) IsOptimistic(root [32]byte) (bool, error) {
 
 // AncestorRoot returns the ancestor root of input block root at a given slot.
 func (f *ForkChoice) AncestorRoot(ctx context.Context, root [32]byte, slot types.Slot) ([32]byte, error) {
-	ctx, span := trace.StartSpan(ctx, "protoArray.AncestorRoot")
+	ctx, span := trace.StartSpan(ctx, "doublyLinkedForkchoice.AncestorRoot")
 	defer span.End()
 
 	f.store.nodesLock.RLock()
@@ -491,9 +491,9 @@ func (f *ForkChoice) UpdateFinalizedCheckpoint(fc *forkchoicetypes.Checkpoint) e
 	return nil
 }
 
-// CommonAncestorRoot returns the common ancestor root between the two block roots r1 and r2.
+// CommonAncestor returns the common ancestor root and slot between the two block roots r1 and r2.
 func (f *ForkChoice) CommonAncestor(ctx context.Context, r1 [32]byte, r2 [32]byte) ([32]byte, types.Slot, error) {
-	ctx, span := trace.StartSpan(ctx, "doublelinkedtree.CommonAncestorRoot")
+	ctx, span := trace.StartSpan(ctx, "doublyLinkedForkchoice.CommonAncestorRoot")
 	defer span.End()
 
 	f.store.nodesLock.RLock()
@@ -663,4 +663,9 @@ func (f *ForkChoice) ForkChoiceDump(ctx context.Context) (*v1.ForkChoiceResponse
 	}
 	return resp, nil
 
+}
+
+// SetBalancesByRooter sets the balanceByRoot handler in forkchoice
+func (f *ForkChoice) SetBalancesByRooter(handler forkchoice.BalancesByRooter) {
+	f.balancesByRoot = handler
 }
